@@ -2,7 +2,7 @@
  * @Author: iDzeir
  * @Date: 2018-11-19 15:02:49
  * @Last Modified by: iDzeir
- * @Last Modified time: 2018-11-19 16:10:49
+ * @Last Modified time: 2018-11-22 14:26:19
  */
 import { AnyAction } from 'redux';
 import { PENDING, FULFILLED, REJECTED } from 'redux-promise-middleware';
@@ -14,8 +14,9 @@ const initStates = {
 };
 
 export default (state = initStates, action: AnyAction) => {
-    console.log(action);
     switch (action.type) {
+        case 'SAY_HELLO_PAYLOAD':
+            return {...state, msg: action.msg};
         case 'ADD':
             return { ...state, current: state.current + 1 };
             return;
