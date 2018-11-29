@@ -2,11 +2,12 @@
  * @Author: iDzeir
  * @Date: 2018-11-22 14:12:41
  * @Last Modified by: iDzeir
- * @Last Modified time: 2018-11-23 18:02:20
+ * @Last Modified time: 2018-11-29 15:47:23
  */
 import { eventChannel, END, delay, channel, buffers } from 'redux-saga';
-import { take, call, put, apply, fork, actionChannel } from 'redux-saga/effects';
+import { take, call, put, apply, fork, actionChannel, all } from 'redux-saga/effects';
 import { log } from 'util';
+import action from "./actions";
 
 function countdown(secs: number) {
     return eventChannel(emitter => {
@@ -20,7 +21,7 @@ function countdown(secs: number) {
     });
 }
 
-export default function* main() {
+function* main() {
     log('启动saga');
     const chan = yield call(countdown, 20);
     try {
@@ -33,6 +34,26 @@ export default function* main() {
         log('countdown terminated');
         yield put({ type: 'SAY_HELLO_PAYLOAD', msg: `countdown terminated` });
     }
+}
+
+function* watchFetchImg() {
+    while(true) {
+        yield take('FETCH_IMG');
+        yield put({type: 'GET_VIDEO_PENDING'});
+        const res = yield call(() => {
+            return new Promise((res, rej) => {
+                fetch('https://dog.ceo/api/breeds/image/random').then(data => res(data.json()))
+            })   
+        });
+        yield put({type: 'GET_VIDEO_FULFILLED', payload: res});
+    }
+}
+
+export default function* () {
+    yield all([
+        watchFetchImg(),
+        main()
+    ])
 }
 
 function createSocketChannel(socket: any) {
